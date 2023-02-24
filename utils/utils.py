@@ -14,6 +14,8 @@ import yaml
 from yaml.loader import SafeLoader
 from .HidingUNet import UnetGenerator
 from .RevealNet import RevealNet
+from .StegoPy import encode_msg, decode_msg, encode_img, decode_img
+from .vae import CNN_VAE
 from dhide_main import weights_init
 
 TRANSFORMS_GRAY = transforms.Compose([ 
@@ -184,8 +186,217 @@ def load_udh_mnist(config="gray_udh"):
     
     return Hnet, Rnet
 
+def load_vae_suds(channels=1, k_num=128, z_size=128, im_size=32):
+    """ 
+    Load vae sanitization model, SUDS
+    
+    Parameters
+    ----------
+    channels : int
+        Number of color channels, 3 = rgb, 1 = grayscale
+    k_num : int
+        kernal number used during training
+    z_size : int
+        latent space size used during training
+    im_size : int
+        image size (32x32)
+        
+    Returns
+    -------
+    vae_model : vae
+    """
+    # 
+    # Get intended load directory
+    # 
+    name = "_"+str(z_size)+"/"
+    # if z_size == 128:
+    #     name = "/"
+    path = "models/sanitization/suds_mnist"+name+"model.pth"
+    print(f"VAE load using --> {path}")
+    assert (os.path.exists(path)), "Model does not exist. Try again."
+    #
+    # Load intended model
+    #
+    vae_model = CNN_VAE(c_in=channels, k_num=k_num, z_size=z_size, im_size=im_size);
+    try:
+        vae_model.load_state_dict(torch.load(path));
+    except:
+        vae_model.load_state_dict(torch.load(path, map_location='cpu'));
+    vae_model.eval();
+    
+    return vae_model
+
+def use_lsb(covers, secrets, sani_model=None):
+    """
+    Create containers using lsb hide method.
+    
+    Parameters
+    ----------
+    covers : tensor
+        cover images
+    secrets : tensor
+        secrets to hide inside covers
+    sani_model : vae
+        the sanitizer to use if using sanitization
+    
+    Returns
+    -------
+    containers : tensor
+        secrets hidden in covers
+    C_res : tensor
+        difference between original cover and the container
+    reveal_secret: tensor
+        The secret revealed from the container
+    S_res : tensor
+        difference between original secret and the recovered secret
+    
+    Add. Returns
+    -----------
+    chat : tensor
+        A sanitized container
+    reveal_sani_secret : tensor
+        The secret recovered after sanitization. R(chat)
+    """
+    if covers.max() <= 1:
+        covers = covers.clone().detach()*255
+        secrets = secrets.clone().detach()*255
+    #
+    # Steg hide
+    #
+    containers = encode_img(covers, secrets, train_mode=True) # steg function is on pixels [0, 255]
+    C_res = containers - covers
+    reveal_secret = decode_img(containers, train_mode=True)
+    S_res = abs(reveal_secret - secrets)
+    #
+    # Sanitize if sanitzer included
+    #
+    if sani_model != None:
+        with torch.no_grad():
+            chat, _, _ = sani_model.forward_train(containers/255) # sani model is on pixels [0, 1]
+        reveal_sani_secret = decode_img(chat*255, train_mode=True)
+        return containers/255, chat, C_res/255, reveal_secret/255, reveal_sani_secret/255, S_res/255
+    
+    return containers/255, C_res/255, reveal_secret/255, S_res/255
 
 
+def use_ddh(covers, secrets, HnetD, RnetD, sani_model=None):
+    """
+    Create containers using ddh hide method.
+    
+    Parameters
+    ----------
+    covers : tensor
+        cover images
+    secrets : tensor
+        secrets to hide inside covers
+    sani_model : vae
+        the sanitizer to use if using sanitization
+    HnetD : ddh hide
+    RnetD : ddh reveal
+    
+    
+    Returns
+    -------
+    containers : tensor
+        secrets hidden in covers
+    C_res : tensor
+        difference between original cover and the container
+    reveal_secret: tensor
+        The secret revealed from the container
+    S_res : tensor
+        difference between original secret and the recovered secret
+    
+    Add. Returns
+    -----------
+    chat : tensor
+        A sanitized container
+    reveal_sani_secret : tensor
+        The secret recovered after sanitization. R(chat)
+    """
+    if covers.max() > 1:
+        covers = covers.clone().detach()/255
+    if secrets.max() > 1:
+        secrets = secrets.clone().detach()/255
+    #
+    # Steg Hide
+    #
+    H_input = torch.cat((covers, secrets), dim=1)
+    with torch.no_grad():
+        containers = HnetD(H_input)
+    
+    C_res = containers - covers
+    with torch.no_grad():
+        reveal_secret = RnetD(containers)
+    S_res = reveal_secret - secrets
+    #
+    # Sanitize if sanitzer included
+    #
+    if sani_model != None:
+        with torch.no_grad():
+            chat, _, _ = sani_model.forward_train(containers) # sani model is on pixels [0, 1]
+            reveal_sani_secret = RnetD(chat)
+        return containers, chat, C_res, reveal_secret, reveal_sani_secret, S_res
+    
+    return containers, C_res, reveal_secret, S_res
+
+
+def use_udh(covers, secrets, Hnet, Rnet, sani_model=None):
+    """
+    Create containers using udh hide method.
+    
+    Parameters
+    ----------
+    covers : tensor
+        cover images
+    secrets : tensor
+        secrets to hide inside covers
+    sani_model : vae
+        the sanitizer to use if using sanitization
+    Hnet : udh hide
+    Rnet : udh reveal
+    
+    
+    Returns
+    -------
+    containers : tensor
+        secrets hidden in covers
+    C_res : tensor
+        difference between original cover and the container
+    reveal_secret: tensor
+        The secret revealed from the container
+    S_res : tensor
+        difference between original secret and the recovered secret
+    
+    Add. Returns
+    -----------
+    chat : tensor
+        A sanitized container
+    reveal_sani_secret : tensor
+        The secret recovered after sanitization. R(chat)
+    """
+    if covers.max() > 1:
+        covers = covers.clone().detach()/255
+    if secrets.max() > 1:
+        secrets = secrets.clone().detach()/255
+    #
+    # Steg Hide
+    #
+    with torch.no_grad():
+        C_res = Hnet(secrets)
+        containers = C_res + covers # maybe gohead and normalize here??
+        reveal_secret = Rnet(containers)
+        S_res = reveal_secret - secrets
+        
+    #
+    # Sanitize if sanitzer included
+    #
+    if sani_model != None:
+        with torch.no_grad():
+            chat, _, _ = sani_model.forward_train(containers) # sani model is on pixels [0, 1]
+            reveal_sani_secret = Rnet(chat)
+        return containers, chat, C_res, reveal_secret, reveal_sani_secret, S_res
+    
+    return containers, C_res, reveal_secret, S_res
 
 
 
