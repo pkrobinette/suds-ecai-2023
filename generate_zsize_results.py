@@ -1,6 +1,5 @@
 """
-Generate Latent Space stats used to create Figure 8.
-
+Generate Latent Space stats used to create Figure 8 and Table 6.
 """
 
 from utils.StegoPy import encode_img, decode_img, encode_msg, decode_msg
@@ -266,8 +265,79 @@ def generate_plots(args):
     # plt.show()
     print(f"\nAll plots saved to: {args.savedir}..\n")
 
-
+def generate_table(args):
+    """
+    Generate a table of feature size image quality data.
+    
+    Parameters
+    ----------
+    args : user defined arguments
+    """
+    print("\nLoading data ... \n")
+    get_name = lambda a : "results/feature_size_img_stats/suds_"+str(a)+".csv"
+    df2 = pd.read_csv(get_name(2))
+    df4 = pd.read_csv(get_name(4))
+    df8 = pd.read_csv(get_name(8))
+    df16 = pd.read_csv(get_name(16))
+    df32 = pd.read_csv(get_name(32))
+    df64 = pd.read_csv(get_name(64))
+    df128 = pd.read_csv(get_name(128))
+    idx = {
+        2: df2,
+        4: df4,
+        8: df8,
+        16: df16,
+        32: df32,
+        64: df64,
+        128: df128,
+    }
+    #
+    # Create functions to easily pull data
+    #
+    get_mse_post = lambda df: json.loads(df["mse"][2].replace("'",  "\""))[args.hide]
+    get_mse_pre = lambda df: json.loads(df["mse"][1].replace("'",  "\""))[args.hide]
+    get_mse_recon = lambda df: json.loads(df["mse"][0].replace("'",  "\""))[args.hide]
+    get_psnr_pre = lambda df: json.loads(df["psnr"][1].replace("'",  "\""))[args.hide]
+    get_psnr_post = lambda df: json.loads(df["psnr"][2].replace("'",  "\""))[args.hide]
+    get_psnr_recon = lambda df: json.loads(df["psnr"][0].replace("'",  "\""))[args.hide]
+    get_mse_recon_cover = lambda df: json.loads(df["mse"][0].replace("'",  "\""))["cover"]
+    get_psnr_recon_cover = lambda df: json.loads(df["psnr"][0].replace("'",  "\""))["cover"]
+    get_df = lambda idx, i: idx[i]
+    #
+    # Get data
+    #
+    pre_mse = [get_mse_pre(get_df(idx, 2**i)) for i in range(1, 8)]
+    post_mse = [get_mse_post(get_df(idx, 2**i)) for i in range(1, 8)]
+    recon_mse = [get_mse_recon(get_df(idx, 2**i)) for i in range(1, 8)]
+    pre_psnr = [get_psnr_pre(get_df(idx, 2**i)) for i in range(1, 8)]
+    post_psnr = [get_psnr_post(get_df(idx, 2**i)) for i in range(1, 8)]
+    recon_psnr = [get_psnr_recon(get_df(idx, 2**i)) for i in range(1, 8)]
+    recon_mse_cover = [get_mse_recon_cover(get_df(idx, 2**i)) for i in range(1, 8)]
+    recon_psnr_cover = [get_psnr_recon_cover(get_df(idx, 2**i)) for i in range(1, 8)]
+    #
+    # Create a table with the data
+    #
+    print("Writing data ...\n")
+    with open(f"{args.savedir}/zsize_results_table.txt", "w") as f:
+        header = "Features(n) | | | Sanitizer Effect | Pre-Sanitization Secret | Post-Sanitization Secret\n"
+        f.write(header)
+        for i in reversed(range(len(MODELS))):
+            model = MODELS[i]
+            line1 = f" | Clean | MSE | {round(recon_mse_cover[i], 2)}| - | - \n"
+            line2 = f"{model} |   | PSNR | {round(recon_psnr_cover[i], 2)}| - | - \n"
+            line3 = f" | LSB | MSE | {round(recon_mse[i], 2)}| {round(pre_mse[i], 2)} | {round(post_mse[i], 2)}\n"
+            line4 = f" |     | PSNR | {round(recon_psnr[i], 2)}| {round(pre_psnr[i], 2)} | {round(post_psnr[i],2)}\n"
+            f.write(line1)
+            f.write(line2)
+            f.write(line3)
+            f.write(line4)
+            
+    print(f"Table data saved to: {args.savedir}/zsize_results_table.txt\n")
+        
+        
+    
 if __name__ == "__main__":
     args = get_args()
     generate_stats(args)
     generate_plots(args)
+    generate_table(args)

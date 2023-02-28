@@ -1,0 +1,29 @@
+Features(n) | | | Sanitizer Effect | Pre-Sanitization Secret | Post-Sanitization Secret
+ | Clean | MSE | 0.28| - | - 
+128 |   | PSNR | 53.77| - | - 
+ | LSB | MSE | 0.45| 0.09 | 62.91
+ |     | PSNR | 51.71| 58.46 | 30.16
+ | Clean | MSE | 0.46| - | - 
+64 |   | PSNR | 51.61| - | - 
+ | LSB | MSE | 0.73| 0.09 | 65.84
+ |     | PSNR | 49.59| 58.46 | 29.96
+ | Clean | MSE | 1.06| - | - 
+32 |   | PSNR | 48.04| - | - 
+ | LSB | MSE | 1.29| 0.09 | 66.13
+ |     | PSNR | 47.15| 58.46 | 29.94
+ | Clean | MSE | 2.54| - | - 
+16 |   | PSNR | 44.23| - | - 
+ | LSB | MSE | 2.82| 0.09 | 65.05
+ |     | PSNR | 43.77| 58.46 | 30.01
+ | Clean | MSE | 6.27| - | - 
+8 |   | PSNR | 40.29| - | - 
+ | LSB | MSE | 6.66| 0.09 | 64.03
+ |     | PSNR | 40.02| 58.46 | 30.08
+ | Clean | MSE | 14.03| - | - 
+4 |   | PSNR | 36.76| - | - 
+ | LSB | MSE | 14.97| 0.09 | 63.12
+ |     | PSNR | 36.47| 58.46 | 30.13
+ | Clean | MSE | 22.22| - | - 
+2 |   | PSNR | 34.74| - | - 
+ | LSB | MSE | 22.99| 0.09 | 62.7
+ |     | PSNR | 34.59| 58.46 | 30.16

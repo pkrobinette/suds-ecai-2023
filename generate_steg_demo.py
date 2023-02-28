@@ -1,5 +1,5 @@
 """
-Generate examples of steganography with LSB, DDH, and/or UDH.
+Generate image examples of steganography with LSB, DDH, and/or UDH.
 
 """
 

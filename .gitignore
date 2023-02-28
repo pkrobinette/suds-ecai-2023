@@ -3,3 +3,5 @@
 **/.ipynb_checkpoints
 logs/**/*
 models/steg/**/*
+data/**/*
+**/data
