@@ -5,3 +5,5 @@ logs/**/*
 models/steg/**/*
 data/**/*
 **/data
+examples/stegomalware/StegExpose
+examples/stegomalware/PowerShell
