@@ -1,0 +1,71 @@
+# mnist ddh
+python3 custom_main_deephide.py \
+  --imageSize 32 \
+  --bs_secret 44 \
+  --num_training 1 \
+  --num_secret 1 \
+  --num_cover 1 \
+  --channel_cover 1 \
+  --channel_secret 1 \
+  --norm 'batch' \
+  --loss 'l2' \
+  --beta 0.75 \
+  --cover_dependent 1 \
+  --data "mnist" \
+  --remark 'ddh' \
+  --experiment_dir 'models/steg/' \
+  --batch_save_frequency 50 \
+  
+# mnist udh
+python3 custom_main_deephide.py \
+  --imageSize 32 \
+  --bs_secret 44 \
+  --num_training 1 \
+  --num_secret 1 \
+  --num_cover 1 \
+  --channel_cover 1 \
+  --channel_secret 1 \
+  --norm 'batch' \
+  --loss 'l2' \
+  --beta 0.75 \
+  --remark 'udh' \
+  --data "mnist" \
+  --cuda 0 \
+  --batch_save_frequency 50 \
+  --experiment_dir 'models/steg/' \
+
+# cifar ddh
+python3 custom_main_deephide.py \
+  --imageSize 32 \
+  --bs_secret 44 \
+  --num_training 1 \
+  --num_secret 1 \
+  --num_cover 1 \
+  --channel_cover 3 \
+  --channel_secret 3 \
+  --norm 'batch' \
+  --loss 'l2' \
+  --beta 0.75 \
+  --cover_dependent 1 \
+  --data "cifar" \
+  --remark 'ddh' \
+  --batch_save_frequency 50 \
+  --experiment_dir 'models/steg/' \
+  
+# cifar udh
+python3 custom_main_deephide.py \
+  --imageSize 32 \
+  --bs_secret 44 \
+  --num_training 1 \
+  --num_secret 1 \
+  --num_cover 1 \
+  --channel_cover 3 \
+  --channel_secret 3 \
+  --norm 'batch' \
+  --loss 'l2' \
+  --beta 0.75 \
+  --remark 'udh' \
+  --data "cifar" \
+  --cuda 0 \
+  --batch_save_frequency 50 \
+  --experiment_dir 'models/steg/' \

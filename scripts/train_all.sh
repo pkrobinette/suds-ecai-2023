@@ -24,3 +24,6 @@ python suds_main.py \
     --expr_name suds_cifar_128 \
     --no-log
     
+# train all steghide methods
+./train_steg_hide.sh
+    

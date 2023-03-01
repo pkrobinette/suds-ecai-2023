@@ -7,3 +7,4 @@ data/**/*
 **/data
 examples/stegomalware/StegExpose
 examples/stegomalware/PowerShell
+Universal-Deep-Hiding/*
