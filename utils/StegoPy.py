@@ -13,6 +13,91 @@ import torch
 # Encode Functions
 # ========================================
 
+def create_rnd_map(imsize=32, p=0.50, train=False):
+    """
+    Create a random map.
+    """
+    m = np.random.rand(imsize, imsize) > p
+    
+    if train:
+        return torch.Tensor(m).unsqueeze(0)
+    
+    return Image.fromarray(m)
+
+
+def msg_to_map(message, imsize=32, train_mode=False):
+    """
+    Create a map from an ascii message.
+    """
+    # if list, return tensor of combined results.
+    if type(message) == list or type(message) == np.ndarray:
+        res = torch.empty((len(message), 1, imsize, imsize))
+        for i in range(res.shape[0]):
+            res[i] = msg_to_map(message[i], imsize, train_mode=True)
+        return res
+            
+    # check message for length
+    if len(message)*8 > imsize**2:
+        print("shortening message")
+        message = message[:((imsize**2)//8)]
+        
+    # convert string to binary
+    bin_m = str_to_bin(message)
+    # create image
+    b_map = np.full((imsize**2,), False)
+    
+    # map bits to particular pixels
+    cnt = 0
+    for char in bin_m:
+        for bit in char:
+            if bit == "1":
+                b_map[cnt] = True
+            cnt += 1
+            
+    #reshape the image (ex: 1024 --> (32, 32))
+    b_map = np.reshape(b_map, (imsize, imsize))
+    
+    if train_mode:
+        b_map = np.expand_dims(b_map, axis=2)
+        return torch.Tensor(b_map.transpose(2,0,1))
+    
+    return Image.fromarray(b_map)
+
+
+def map_to_msg(im, train_mode=False):
+    """
+    Uncover a plaintxt message from a black and white map.
+    """
+    # make sure image is in binary format
+    if im.max() > 1.0:
+        im = torch.where(im/255>0.19, 1.0, 0.0)
+    else:
+        im = torch.where(im > 0.19, 1.0, 0.0)
+    # convert image to numpy array
+    data = np.array(im)
+    if train_mode:
+        data = data.transpose(2, 0, 1)
+    
+    # flatten the data
+    im = data.flatten()
+
+    # list of bytes
+    r_map = []
+
+    # create list of bytes from image
+    for i in range(im.shape[0]):
+        # reset the character
+        if i%8 == 0:
+            if i != 0:
+                if char == "00000000":
+                    break
+                r_map.append(char)
+            char = ""
+        char += "1" if im[i] == True else "0"
+    
+    # convert binary to string and return
+    return bin_to_str(r_map)
+
 def encode_msg_bit(cover, msg, bits=4, train_mode=False):
     """
     Embed a message into a cover image using LSB.

@@ -7,7 +7,7 @@ import glob
 import time
 import argparse
 from PIL import Image
-from rawkit import raw
+# from rawkit import raw
 import torchvision
 import torch
 import torch.nn as nn
@@ -20,13 +20,19 @@ from .RevealNet import RevealNet
 from .StegoPy import encode_msg, decode_msg, encode_img, decode_img
 from .vae import CNN_VAE
 from .classifier import Classifier
-from dhide_main import weights_init
+import torch.nn.init as init
 import itertools
 from tqdm import tqdm
 from torch.nn.functional import normalize
 from skimage.util import random_noise
 import numpy as np
 import random
+
+import scraperwiki
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+import re
+URL = "http://shakespeare.mit.edu/twelfth_night/full.html"
 
 np.random.seed(4)
 random.seed(4)
@@ -43,6 +49,52 @@ TRANSFORMS_RGB = transforms.Compose([
             ])  
 
 SUDS_CONFIG_PATH = "configs/" # CHANGE IF DIFFERENT
+
+def get_embed_data(url=URL):
+    """
+    (helper func.)
+    Scrape a shakespeare play for sentences.
+    
+    Parameters
+    ----------
+    url : str
+        The url to scrape. Current set up is designed for shakespeare.mit
+    """
+    html = scraperwiki.scrape(url)
+    
+    soup = BeautifulSoup(html)
+    
+    sentences = []
+    
+    for a in soup.findAll("a"):
+        b = str(a)
+        if "speech" not in b and "href" not in b:
+            b = remove_tags(b)
+            if b[0].isupper and b[-1] in ["?", ";", "."]:
+                sentences.append(b)
+            
+    return sentences
+
+def remove_tags(html_string):
+    """ 
+    (helper func.)
+    Remove html tags from scraped data
+    """
+    return re.sub(r'<.*?>', '', html_string)
+
+
+# Custom weights initialization called on netG and netD
+def weights_init(m):
+    """
+    Init weights.
+    """
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1:
+        init.kaiming_normal_(m.weight.data, a=0, mode='fan_out')
+    elif classname.find('BatchNorm') != -1:
+        m.weight.data.fill_(1.0) 
+        m.bias.data.fill_(0)
+
 
 def load_data(dataset, batch_size=128):
     """
