@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 import argparse
 import os
 import pandas as pd
+from skimage.metrics import mean_squared_error as MSE
+from torch.nn.functional import normalize
 
 np.random.seed(4)
 random.seed(4)
@@ -92,21 +94,22 @@ def main():
             #
             # MSE STATS
             # get mse of covers (in [0, 255])
-            sani = sani.view(d, -1)*255               # in 255 range
-            containers = containers.view(d, -1)       # in 255 range
+            sani = sani.view(d, -1)*255              # in 255 range
+            containers = containers.view(d, -1)      # in 255 range
             bin_maps = bin_maps.view(d, -1)*255       # in 255 range
             reveal_sani = reveal_sani.view(d, -1)     # in 255 range
             total_mse_covers += loss(containers, sani)
             # # get mse of bit_maps (in [0, 255])
             total_mse_bitmaps += loss(bin_maps, reveal_sani)
+
         
-        mean_mse_covers = total_mse_covers / len(test_loader)
-        mean_mse_bitmaps = total_mse_bitmaps / len(test_loader)
-        mean_recoverable = total_recoverable / len(test_loader)
+        mean_mse_covers = round((total_mse_covers.item() / len(test_loader))/255, 2)
+        mean_mse_bitmaps = round((total_mse_bitmaps.item() / len(test_loader))/255, 2)
+        mean_recoverable = round((total_recoverable.item() / len(test_loader))/255, 2)
         print("MSE Covers: ", mean_mse_covers)
         print("MSE Bitmaps: ", mean_mse_bitmaps)
         print("% Recoverable: ", mean_recoverable)
-        result["lsb"] = [mean_mse_covers.item(), mean_mse_bitmaps.item(), mean_recoverable]
+        result["lsb"] = [mean_mse_covers, mean_mse_bitmaps, mean_recoverable]
         
     if args.ddh:
         HnetD, RnetD = load_ddh_mnist()
@@ -129,30 +132,30 @@ def main():
             #
             # see if secrets are recoverable
             #
-            decode = [map_to_msg(img) for img in reveal_sani]
+            decode = [map_to_msg(img) for img in reveal_sani_secrets]
             res = [e == d for e, d in zip(sentences[sent_idx], decode)]
             total_recoverable += np.mean(res)
             #
             # MSE STATS
             # get mse of covers (in [0, 255])
-            sani = sani.view(d, -1)*255               # in 255 range
-            containers = containers.view(d, -1)*255      # in 255 range
+            sani = sani.view(d, -1)*255              # in 255 range
+            containers = containers.view(d, -1)*255       # in 255 range
             bin_maps = bin_maps.view(d, -1)*255       # in 255 range
-            reveal_sani = reveal_sani.view(d, -1)*255     # in 255 range
+            reveal_sani_secrets = reveal_sani_secrets.view(d, -1)*255     # in 255 range
             total_mse_covers += loss(containers, sani)
             # # get mse of bit_maps (in [0, 255])
-            total_mse_bitmaps += loss(bin_maps, reveal_sani)
+            total_mse_bitmaps += loss(bin_maps, reveal_sani_secrets)
         
-        mean_mse_covers = total_mse_covers / len(test_loader)
-        mean_mse_bitmaps = total_mse_bitmaps / len(test_loader)
-        mean_recoverable = total_recoverable / len(test_loader)
+        mean_mse_covers = round((total_mse_covers.item() / len(test_loader))/255, 2)
+        mean_mse_bitmaps = round((total_mse_bitmaps.item() / len(test_loader))/255, 2)
+        mean_recoverable = round((total_recoverable.item() / len(test_loader))/255, 2)
         print("MSE Covers: ", mean_mse_covers)
         print("MSE Bitmaps: ", mean_mse_bitmaps)
         print("% Recoverable: ", mean_recoverable)
-        result["ddh"] = [mean_mse_covers.item(), mean_mse_bitmaps.item(), mean_recoverable]
+        result["lsb"] = [mean_mse_covers, mean_mse_bitmaps, mean_recoverable]
         
     if args.udh:
-        Hnet, Rnet = load_ddh_mnist()
+        Hnet, Rnet = load_udh_mnist()
         print("Running UDH ...")
         total_mse_covers = 0
         total_mse_bitmaps = 0
@@ -172,7 +175,7 @@ def main():
             #
             # see if secrets are recoverable
             #
-            decode = [map_to_msg(img) for img in reveal_sani]
+            decode = [map_to_msg(img) for img in reveal_sani_secrets]
             res = [e == d for e, d in zip(sentences[sent_idx], decode)]
             total_recoverable += np.mean(res)
             #
@@ -181,18 +184,18 @@ def main():
             sani = sani.view(d, -1)*255               # in 255 range
             containers = containers.view(d, -1)*255      # in 255 range
             bin_maps = bin_maps.view(d, -1)*255       # in 255 range
-            reveal_sani = reveal_sani.view(d, -1)*255     # in 255 range
+            reveal_sani_secrets = reveal_sani_secrets.view(d, -1)*255     # in 255 range
             total_mse_covers += loss(containers, sani)
             # # get mse of bit_maps (in [0, 255])
-            total_mse_bitmaps += loss(bin_maps, reveal_sani)
+            total_mse_bitmaps += loss(bin_maps, reveal_sani_secrets)
         
-        mean_mse_covers = total_mse_covers / len(test_loader)
-        mean_mse_bitmaps = total_mse_bitmaps / len(test_loader)
-        mean_recoverable = total_recoverable / len(test_loader)
+        mean_mse_covers = round((total_mse_covers.item() / len(test_loader))/255, 2)
+        mean_mse_bitmaps = round((total_mse_bitmaps.item() / len(test_loader))/255, 2)
+        mean_recoverable = round((total_recoverable.item() / len(test_loader))/255, 2)
         print("MSE Covers: ", mean_mse_covers)
         print("MSE Bitmaps: ", mean_mse_bitmaps)
         print("% Recoverable: ", mean_recoverable)
-        result["udh"] = [mean_mse_covers.item(), mean_mse_bitmaps.item(), mean_recoverable]
+        result["lsb"] = [mean_mse_covers, mean_mse_bitmaps, mean_recoverable]
         
     # save all data:
     # with open(path, "w") as f:
