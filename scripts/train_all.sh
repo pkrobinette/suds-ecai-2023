@@ -27,3 +27,4 @@ python suds_main.py \
 # train all steghide methods
 ./train_steg_hide.sh
     
+python make_pretty_picture.py
