@@ -2,6 +2,29 @@
 
 ## Installation
 
+## Artifact Instructions
+1. The models must be trained before the results can be replicated.
+```
+chmod +x scripts/*
+./scripts/train_all.sh
+```
+2. Replicate the results
+```
+./scripts/test_all.sh
+```
+
+All results are saved to the `results` folder. Descriptions of each folder and their corresponding research questions are below.
+
+- RQ1: 
+
+- RQ2
+
+- RQ3
+
+- RQ4
+
+- RQ5
+
 ## File Descriptions
 #### Training
 > `suds_main.py`: main suds training file (sanitizing)
