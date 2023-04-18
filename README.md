@@ -12,18 +12,24 @@ chmod +x scripts/*
 ```
 ./scripts/test_all.sh
 ```
+## Results Index
+All results are saved to the `results` folder. The results are indexeable by research question or figure number.
 
-All results are saved to the `results` folder. Descriptions of each folder and their corresponding research questions are below.
+- **RQ1:** Images -> `noise_vs_suds_demo`, Stats -> `noise_comparison`
+- **RQ2:** Images -> `noise_vs_suds_demo`, Stats -> `noise_comparison`
+- **RQ3:** `feature_size_img_stats`
+- **RQ4:** `latent_mappings`
+- **RQ5:** `sanitize_demo_cifar`
+---
+- **Table 3:** `noise_comparison/all_img_stats.txt`
+- **Figure 3a:** `noise_vs_suds_demo/suds-pretty-picture.pdf`
+- **Figure 3b:** `noise_vs_suds_demo/noise-pretty-picture.pdf`
+- **Figure 3c:** `sanitize_demo_cifar/cifar-suds-pretty-picture.pdf`
+- **Figure 4:** `feature_size_img_stats/z_size_results.pdf`
+- **Figure 5:** `latent_mappings/latent_mappings_plot_compact.pdf`
+- **Table 4:** `data_poison/classification_results.txt`
 
-- RQ1: 
 
-- RQ2
-
-- RQ3
-
-- RQ4
-
-- RQ5
 
 ## File Descriptions
 #### Training
