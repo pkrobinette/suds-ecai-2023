@@ -667,7 +667,7 @@ def udh_eval_latent_all(test_loader, master_idx, Hnet, vae_model):
     return z_cover_all, z_cont_all, master_l
 
 
-def add_gauss(imgs, mu=0, sigma=0.01):
+def add_gauss(imgs, mu=0, sigma=0.02):
     """
     Add gaussian noise to images.
     
@@ -680,10 +680,15 @@ def add_gauss(imgs, mu=0, sigma=0.01):
     sigma : float
         std
     """
+    # creat a mask for the noise
+    rnd_tnsor = torch.rand(imgs.shape)
+    mask = (rnd_tnsor > 0.5).float()
+    
     dim = list(imgs.shape)
     n = torch.normal(mu, sigma, dim)
+    n = mask*n
     
-    return imgs + n
+    return torch.clip(imgs + n, 0, 1)
 
 def add_saltnpep(imgs, pep=0.2):
     """

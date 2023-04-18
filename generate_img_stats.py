@@ -348,26 +348,33 @@ def generate_table(args):
     hide = ["cover", "lsb", "ddh", "udh"]
     print("Writing data ...\n")
     with open(f"{args.savedir}/all_img_stats.txt", "w") as f:
-        header = "Sanitizer |  | | Sanitizer Effect | Pre-Sanitization Secret | Post-Sanitization Secret\n"
+        header = "Sanitizer &  & & Sanitizer Effect & Pre-Sanitization Secret & Post-Sanitization Secret\\\n"
         f.write(header)
         f.write("-----------------------------------------\n")
         for key in dfs.keys():
             df = dfs[key]
             for h in hide:
                 if h == "cover":
-                    line1 =  f"        | Clean | MSE  | {round(get_mse_recon_cover(df), 2)}| - | - \n"
-                    line2 =  f"        |       | PSNR | {round(get_psnr_recon_cover(df), 2)}| - | - \n"
+                    line1 =  f"        & Clean & MSE  & {round(get_mse_recon_cover(df), 2)}& - & - \\\ \n"
+                    line2 =  f"        &       & PSNR & {round(get_psnr_recon_cover(df), 2)}& - & - \\\ \n"
                 elif h == "ddh":
-                    line1 =  f" {key}  | DDH | MSE | {round(get_mse_recon(df, h), 2)}| {round(get_mse_pre(df, h), 2)} | {round(get_mse_post(df, h), 2)}\n"
-                    line2 =  f"        |     | PSNR | {round(get_psnr_recon(df, h), 2)}| {round(get_psnr_pre(df,h), 2)} | {round(get_psnr_post(df, h), 2)}\n"
+                    line1 =  f" {key}  & DDH & MSE & {round(get_mse_recon(df, h), 2)}& {round(get_mse_pre(df, h), 2)} & {round(get_mse_post(df, h), 2)}\\\ \n"
+                    line2 =  f"        &     & PSNR & {round(get_psnr_recon(df, h), 2)}& {round(get_psnr_pre(df,h), 2)} & {round(get_psnr_post(df, h), 2)}\\\ \n"
                 else:
-                    line1 =  f"        | DDH | MSE | {round(get_mse_recon(df, h), 2)}| {round(get_mse_pre(df, h), 2)} | {round(get_mse_post(df, h), 2)}\n"
-                    line2 =  f"        |     | PSNR | {round(get_psnr_recon(df, h), 2)}| {round(get_psnr_pre(df, h), 2)} | {round(get_psnr_post(df, h), 2)}\n"
+                    line1 =  f"        & DDH & MSE & {round(get_mse_recon(df, h), 2)}& {round(get_mse_pre(df, h), 2)} & {round(get_mse_post(df, h), 2)}\\\ \n"
+                    line2 =  f"        &     & PSNR & {round(get_psnr_recon(df, h), 2)}& {round(get_psnr_pre(df, h), 2)} & {round(get_psnr_post(df, h), 2)}\\\ \n"
+                # write everything out
+                if key == "gauss" or key == "saltnpep":
+                    f.write("\\rowcolor{Gray}")
                 f.write(line1)
+                if key == "gauss" or key == "saltnpep":
+                    f.write("\\rowcolor{Gray}")
                 f.write(line2)
                 if h == "udh":
-                    f.write("-----------------------------------------\n")
-    print(f"Saved table to: {args.savedir}/all_img_stats.txt")
+                    f.write("\hline\n")
+                else:
+                    f.write("\cline{2-6}\n")
+    print(f"Saved table to: {args.savedir}/all_img_stats_latex.txt")
     
 
 def main(args):
@@ -380,6 +387,10 @@ def main(args):
         args.gauss = True
         args.speckle = True
         args.saltnpep = True
+    print(f"Running SUDS: {args.suds}")
+    print(f"Running Gauss: {args.gauss}")
+    print(f"Running Speckle: {args.speckle}")
+    print(f"Running SaltNPep: {args.saltnpep}")
     #
     # load models
     #
@@ -404,6 +415,9 @@ def main(args):
         "RnetD": RnetD,
         "suds": suds,
     }
+    # args.suds will override noise if true. Temp fix.
+    temp = args.suds
+    args.suds = False
     if args.gauss:
         kwargs["noise"] = noise_catalog["gauss"]
         args.save_name = "gauss_im_stats"
@@ -417,7 +431,7 @@ def main(args):
         args.save_name = "saltnpep_im_stats"
         calc_stats(test_loader, args, **kwargs)
     # key in suds
-    args.suds = True
+    args.suds = temp
     if args.suds:
         # kwargs["noise"] = noise_catalog["gauss"]
         args.save_name = "suds_im_stats"
@@ -426,7 +440,7 @@ def main(args):
 
 if __name__ == "__main__":
     args = get_args()
-    main(args)
+    # main(args)
     generate_table(args)
 
     

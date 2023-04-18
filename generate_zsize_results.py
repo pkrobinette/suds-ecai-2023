@@ -263,6 +263,21 @@ def generate_plots(args):
     plt.xlim([0, 130])
     plt.savefig(f"{args.savedir}/psnr_zsize_results.pdf")
     # plt.show()
+    plt.figure(3)
+    plt.plot([2**i for i in range(1, 8)], recon_mse, "^-", color="green", label="MSE C-hat - C'")
+    plt.plot([2**i for i in range(1, 8)], pre_mse, "|-", color="green", label="MSE S'")
+    plt.plot([2**i for i in range(1, 8)], post_mse, 'x-', color="green", label="MSE S-hat")
+    plt.plot([2**i for i in range(1, 8)], recon_psnr, "^--", color="blue", label="PSNR C-hat - C'")
+    plt.plot([2**i for i in range(1, 8)], pre_psnr, "|--", color="blue", label="PSNR S'")
+    plt.plot([2**i for i in range(1, 8)], post_psnr, 'x--', color="blue", label="PSNR S-hat")
+    plt.legend(fontsize=12, loc='upper center', ncol=3, bbox_to_anchor=(0.5, 1.2))
+    plt.xlabel("Number of Features (n)" ,**csfont)
+    plt.ylabel("MSE/PSNR", **csfont)
+    plt.ylim([-5, 75])
+    plt.xlim([0, 130])
+    plt.tight_layout()
+    plt.savefig(f"{args.savedir}/zsize_results.pdf")
+    # plt.show()
     print(f"\nAll plots saved to: {args.savedir}..\n")
 
 def generate_table(args):
@@ -338,6 +353,6 @@ def generate_table(args):
     
 if __name__ == "__main__":
     args = get_args()
-    generate_stats(args)
+    # generate_stats(args)
     generate_plots(args)
-    generate_table(args)
+    # generate_table(args)
