@@ -82,22 +82,22 @@ def pretty_picture(input_path, save_name, noise="suds", imsize=64, dataset="mnis
                 combined_image.paste(image, (x, y))
     
     # Save the combined image
-    save_path = input_path + save_name if input_path[-1] == "/" else input_path + "/" + save_name
-    combined_image.save(save_path)
+    # save_path = input_path + save_name if input_path[-1] == "/" else input_path + "/" + save_name
+    combined_image.save(save_name)
     
-    print("Saved to: ", save_path)
+    print("Saved to: ", save_name)
     
     
 if __name__ == "__main__":
-    input_path = "results/noise_vs_suds_demo/"
-    output_path = "suds-pretty-picture.pdf"
+    input_path = "results/RQ1-RQ2-imgs/"
+    output_path = "results/suds-pretty-picture.pdf"
     # suds-mnist
     pretty_picture(input_path, output_path, noise="suds", dataset="mnist")
     # noise-mnist
-    output_path = "noise-pretty-picture.pdf"
+    output_path = "results/noise-pretty-picture.pdf"
     pretty_picture(input_path, output_path, noise="gauss", dataset="mnist")
     # suds-cifar
-    input_path = "results/sanitize_demo_cifar/"
-    output_path = 'cifar-suds-pretty-picture.pdf'
+    input_path = "results/RQ5-imgs-cifar/"
+    output_path = 'results/cifar-suds-pretty-picture.pdf'
     pretty_picture(input_path, output_path, noise="suds", dataset="cifar")
     

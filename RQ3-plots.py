@@ -1,5 +1,5 @@
 """
-Generate Latent Space stats used to create Figure 8 and Table 6.
+Generate Latent Space stats used to create Figure 4. RQ3.
 """
 
 from utils.StegoPy import encode_img, decode_img, encode_msg, decode_msg
@@ -53,7 +53,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--hide", type=str, default="lsb", help="The hiding method to use during testing")
     parser.add_argument("--model", type=int, default=None, help="The model to use during testing.")
-    parser.add_argument("--savedir", type=str, default="results/feature_size_img_stats")
+    parser.add_argument("--savedir", type=str, default="results/RQ3-plots")
     
     args = parser.parse_args()
     
@@ -353,6 +353,6 @@ def generate_table(args):
     
 if __name__ == "__main__":
     args = get_args()
-    # generate_stats(args)
+    generate_stats(args)
     generate_plots(args)
     generate_table(args)

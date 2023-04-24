@@ -51,7 +51,7 @@ def get_args():
     parser.add_argument('--ddh', action='store_true', help='Enable DDH option')
     parser.add_argument('--udh', action='store_true', help='Enable UDH option')
     parser.add_argument('--lsb', action='store_true', help='Enable LSB option')
-    parser.add_argument('--savedir', type=str, default="results/noise_vs_suds_demo", help='The directory path to save demo imgs.')
+    parser.add_argument('--savedir', type=str, default="results/RQ1-RQ2-imgs", help='The directory path to save demo imgs.')
     
     args = parser.parse_args()
     return args

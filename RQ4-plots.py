@@ -37,7 +37,7 @@ def get_args():
     Get training arguments 
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("--savedir", type=str, default="results/latent_mappings")
+    parser.add_argument("--savedir", type=str, default="results/RQ4-plots")
     parser.add_argument("--model", type=int, default=8)
     
     args = parser.parse_args()

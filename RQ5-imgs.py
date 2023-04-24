@@ -1,5 +1,5 @@
 """
-Generate examples of sanitizing steganography using SUDS on LSB, DDH, and/or UDH.
+Generate examples of sanitizing steganography using SUDS on LSB, DDH, and/or UDH. CIFAR for RQ5.
 
 """
 
@@ -40,7 +40,7 @@ def get_args():
     parser.add_argument('--ddh', action='store_true', help='Enable DDH option')
     parser.add_argument('--udh', action='store_true', help='Enable UDH option')
     parser.add_argument('--lsb', action='store_true', help='Enable LSB option')
-    parser.add_argument('--savedir', type=str, default="results/sanitize_demo", help='The directory path to save demo imgs.')
+    parser.add_argument('--savedir', type=str, default="results/RQ5-imgs", help='The directory path to save demo imgs.')
     parser.add_argument("--dataset", type=str, default="cifar", help="The dataset to use. mnist or cifar.")
     
     args = parser.parse_args()
@@ -168,10 +168,10 @@ def main():
     # 
     # Run and save lsb
     # 
-    make_folder(args.savedir+"_"+args.dataset)
+    make_folder(args.savedir+"-"+args.dataset)
     if args.lsb:
-        print(f"Demoing LSB, imgs saved to: {args.savedir}_{args.dataset}/lsb_demo/")
-        save_path = f"{args.savedir}_{args.dataset}/lsb_demo/"
+        print(f"Demoing LSB, imgs saved to: {args.savedir}-{args.dataset}/lsb_demo/")
+        save_path = f"{args.savedir}-{args.dataset}/lsb_demo/"
         C_folder = "C"
         Cprime_folder = "C_prime"
         Chat_folder = "C_hat"
@@ -254,8 +254,8 @@ def main():
     # Run and save ddh
     # 
     if args.ddh:
-        print(f"Demoing DDH, imgs saved to: {args.savedir}_{args.dataset}/ddh_demo/")
-        save_path = f"{args.savedir}_{args.dataset}/ddh_demo/"
+        print(f"Demoing DDH, imgs saved to: {args.savedir}-{args.dataset}/ddh_demo/")
+        save_path = f"{args.savedir}-{args.dataset}/ddh_demo/"
         C_folder = "C"
         Cprime_folder = "C_prime"
         Chat_folder = "C_hat"
@@ -337,8 +337,8 @@ def main():
     # Run and save udh
     # 
     if args.udh:
-        print(f"Demoing UDH, imgs saved to: {args.savedir}_{args.dataset}/udh_demo/")
-        save_path = f"{args.savedir}_{args.dataset}/udh_demo/"
+        print(f"Demoing UDH, imgs saved to: {args.savedir}-{args.dataset}/udh_demo/")
+        save_path = f"{args.savedir}-{args.dataset}/udh_demo/"
         C_folder = "C"
         Cprime_folder = "C_prime"
         Chat_folder = "C_hat"

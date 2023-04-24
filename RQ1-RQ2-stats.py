@@ -1,6 +1,6 @@
 """
 Calculate image quality statistics for different
-types of sanitization (suds vs. noise).
+types of sanitization (suds vs. noise). RQ1, RQ2
 """
 from utils.utils import lsb_eval_latent_all,\
     ddh_eval_latent_all,\
@@ -49,7 +49,7 @@ def get_args():
     """
     parser = argparse.ArgumentParser()
     # ----
-    parser.add_argument("--savedir", type=str, default="results/noise_comparison", help="Meta directory used to save.")
+    parser.add_argument("--savedir", type=str, default="results/RQ1-RQ2-stats", help="Meta directory used to save.")
     parser.add_argument("--save_name", type=str, default=None, help="save name")
     feature_parser = parser.add_mutually_exclusive_group(required=False)
     parser.add_argument('--gauss', action='store_true', help='Enable gauss noise option')
@@ -393,8 +393,6 @@ def main(args):
     #
     noise_catalog = {
         "gauss": add_gauss,
-        "speckle": add_speckle,
-        "saltnpep": add_saltnpep,
     }
     kwargs = {
         "Hnet": Hnet,
@@ -407,12 +405,14 @@ def main(args):
     temp = args.suds
     args.suds = False
     if args.gauss:
+        print("%%%%% GENERATING GAUSSIAN STATS %%%%%%")
         kwargs["noise"] = noise_catalog["gauss"]
         args.save_name = "gauss_im_stats"
         calc_stats(test_loader, args, **kwargs)
     # key in suds
     args.suds = temp
     if args.suds:
+        print("%%%%% GENERATING SUDS STATS %%%%%%")
         # kwargs["noise"] = noise_catalog["gauss"]
         args.save_name = "suds_im_stats"
         calc_stats(test_loader, args, **kwargs)
