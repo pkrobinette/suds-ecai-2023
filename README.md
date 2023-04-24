@@ -1,33 +1,37 @@
 # SUDS: Sanitizing Universal and Dependent Steganography
 
 ## Installation
+```
+docker build -t suds_image . 
+```
+
+```
+sudo docker run --name suds --rm -it suds_image bash
+```
+
 
 ## Artifact Instructions
-1. The models must be trained before the results can be replicated.
+All models are pre-trained. Reproduce results by:
+
 ```
 chmod +x scripts/*
-./scripts/train_all.sh
-```
-2. Replicate the results
-```
 ./scripts/test_all.sh
 ```
-## Results Index
-All results are saved to the `results` folder. The results are indexeable by research question or figure number.
+2. If you would like to reproduce a specific figure, see the index below and run:
+```
+python *.py
+```
 
-- **RQ1:** Images -> `noise_vs_suds_demo`, Stats -> `noise_comparison`
-- **RQ2:** Images -> `noise_vs_suds_demo`, Stats -> `noise_comparison`
-- **RQ3:** `feature_size_img_stats`
-- **RQ4:** `latent_mappings`
-- **RQ5:** `sanitize_demo_cifar`
----
-- **Table 3:** `noise_comparison/all_img_stats.txt`
-- **Figure 3a:** `noise_vs_suds_demo/suds-pretty-picture.pdf`
-- **Figure 3b:** `noise_vs_suds_demo/noise-pretty-picture.pdf`
-- **Figure 3c:** `sanitize_demo_cifar/cifar-suds-pretty-picture.pdf`
-- **Figure 4:** `feature_size_img_stats/z_size_results.pdf`
-- **Figure 5:** `latent_mappings/latent_mappings_plot_compact.pdf`
-- **Table 4:** `data_poison/classification_results.txt`
+## Results Index
+All results are saved to the `results` folder. The results are indexable by research question or figure number.
+
+- **Table 3:** `results/RQ1-RQ2-stats/all_img_stats.txt`
+- **Figure 3a:** `results/suds-pretty-picture.pdf`
+- **Figure 3b:** `results/noise-pretty-picture.pdf`
+- **Figure 3c:** `results/cifar-suds-pretty-picture.pdf`
+- **Figure 4:** `results/RQ3-plots/zsize_results.pdf`
+- **Figure 5:** `results/RQ4-plots/latent_mappings_plot_compact.pdf`
+- **Table 4:** `results/data_poison/classification_results.txt`
 
 
 
@@ -35,28 +39,26 @@ All results are saved to the `results` folder. The results are indexeable by res
 #### Training
 > `suds_main.py`: main suds training file (sanitizing)
 
-> `dhide_main.py`: main udh and ddh training file (hiding)
+> `custom_main_deephide.py`: main udh and ddh training file (hiding)
 
 
 #### Testing
-> `generate_steg_demo.py`: generate images demonstrating lsb hiding, ddh hiding, and udh hiding.
+> `RQ1`: SUDS ability to sanitize
 
-> `generate_suds_demo.py`: generate images demonstrating sanitization peformance of suds.
+> `RQ2`: SUDS comparison to Gaussian noise
 
-> `generate_noise_demo.py`: generate image demonstrating the ability of noise to sanitize steg images.
+> `RQ3`: flexibility; SUDS with different latent space dimensions
 
-> `generate_noise_stats.py`: generate image quality stats for all sanitization techniques and steg hide functions.
+> `RQ4`: SUDS for detection
 
-> `generate_zsize_results.py`: compare suds performance for different latent space sizes (z)
+> `RQ5`: scalability; SUDS on CIFAR-10
 
-> `generate_latent_mapping.py`: explore where covers and containers get mapped to in the latent space.
+> `CASE STUDY`: Data poisoning
 
 #### Directories
 > `configs`: training config files for udh and ddh
 
-> `data`: where mnist and cifar are loaded and stored
-
-> `examples`: case studies: data poisoning, stegomalware
+> `examples`: case studies: data poisoning
 
 > `models`: all pre-trained models
 
@@ -64,7 +66,11 @@ All results are saved to the `results` folder. The results are indexeable by res
 
 > `scripts`: easy to run training and testing scripts
 
-> `utils`: the brains of the operation. Helper functions. Model files. Etc.
+> `utils`: Helper functions. Model files. Etc.
 
 ## Notes
-For questions, please feel free to contact me.
+- If docker throws a disk space error, try running this prior to building:
+```
+docker system prune
+```
+

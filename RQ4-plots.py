@@ -25,12 +25,13 @@ import os
 np.random.seed(4)
 random.seed(4)
 sns.set()
-font = {'family' : 'Verdana',
-        'weight' : 'normal',
+font = {'weight' : 'normal',
+        # 'family' : 'Verdana', # docker does not like. removed.
         'size'   : 30}
 
 mpl.rc('font', **font)
-csfont = {'family':'Verdana', 'fontsize':14}
+# csfont = {'family':'Verdana', 'fontsize':14}
+csfont = {'fontsize':14} # docker does not like
 
 def get_args():
     """ 

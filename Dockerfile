@@ -1,29 +1,24 @@
 #
-# Self-Preserving Genetic Algorithms
+# Sanitizing Universal and Dependent Steganography
 #
 
-FROM python:3.9
+# Define base image/operating system
+FROM python:3.8
 
-# set the user to root
-USER root
+# ENV DEBIAN_FRONTEND=noninteractive
 
-# set working directory to spga
-WORKDIR /spga
-
-# install pip
-RUN set -xe \
-    && apt-get update -y \
+# Install software
+RUN apt-get update -y \
     && apt-get install -y python3-pip
-RUN pip install --upgrade pip
 
-# set environment variables
-ENV PYTHONPATH='/spga'
-# ENV OPENBLAS_NUM_THREADS=1
-# ENV OMP_NUM_THREADS=1
+# Set container's working directory
+WORKDIR /ecai-2023
 
-# copy files to docker
+# Copy files and directory structure to working directory
 COPY . .
 
-# install python package dependencies
-RUN pip install .
-# RUN pip3 install seaborn -U
+# Install necessary packages for SUDS
+RUN pip install -r requirements.txt
+
+# Run commands specified in "run.sh" to get started
+# ENTRYPOINT ["sh", "scripts/test_all.sh"]

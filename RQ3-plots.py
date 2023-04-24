@@ -200,7 +200,7 @@ def generate_plots(args):
     # Load data
     #
     print("\nLoading data ... \n")
-    get_name = lambda a : "results/feature_size_img_stats/suds_"+str(a)+".csv"
+    get_name = lambda a : f"{args.savedir}/suds_"+str(a)+".csv"
     df2 = pd.read_csv(get_name(2))
     df4 = pd.read_csv(get_name(4))
     df8 = pd.read_csv(get_name(8))
@@ -289,7 +289,7 @@ def generate_table(args):
     args : user defined arguments
     """
     print("\nLoading data ... \n")
-    get_name = lambda a : "results/feature_size_img_stats/suds_"+str(a)+".csv"
+    get_name = lambda a : f"{args.savedir}/suds_"+str(a)+".csv"
     df2 = pd.read_csv(get_name(2))
     df4 = pd.read_csv(get_name(4))
     df8 = pd.read_csv(get_name(8))
