@@ -25,14 +25,15 @@ python *.py
 ## Results Index
 All results are saved to the `results` folder. The results are indexable by research question or figure number.
 
-- **Table 3:** `results/RQ1-RQ2-stats/all_img_stats.txt`
-- **Figure 3a:** `results/suds-pretty-picture.pdf`
-- **Figure 3b:** `results/noise-pretty-picture.pdf`
-- **Figure 3c:** `results/cifar-suds-pretty-picture.pdf`
-- **Figure 4:** `results/RQ3-plots/zsize_results.pdf`
-- **Figure 5:** `results/RQ4-plots/latent_mappings_plot_compact.pdf`
-- **Table 4:** `results/data_poison/classification_results.txt`
-
+| Artifact | Python Script | Result Location |
+| -------- | -------- | -------- |
+| **Table 3:** | `python RQ1-RQ2-stats.py` | `results/RQ1-RQ2-stats/all_img_stats.txt` |
+| **Figure 3a:** |  `python RQ1-RQ2-imgs.py` | `results/suds-pretty-picture.pdf` |
+| **Figure 3b:** | `python RQ3-plots.py` | `results/noise-pretty-picture.pdf` |
+| **Figure 3c:** |  `python RQ4-plots.py` | `results/cifar-suds-pretty-picture.pdf` |
+| **Figure 4:** | `python RQ5-imgs.py` | `results/RQ3-plots/zsize_results.pdf` |
+| **Figure 5:** | `python make_pretty_pictures.py` | `results/RQ4-plots/latent_mappings_plot_compact.pdf` |
+| **Table 4:** |  `python examples/data_poison/test_data_poison.py` | `results/data_poison/classification_results.txt` |
 
 
 ## File Descriptions
