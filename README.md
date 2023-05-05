@@ -1,6 +1,14 @@
 # SUDS: Sanitizing Universal and Dependent Steganography
 
 ## Installation
+### Conda Environment (Recommended)
+This creates, activates, and installs all necessary dependencies.
+```
+conda create -y -n SUDS pip python=3.8 && conda activate SUDS && pip install -r requirements.txt
+```
+
+
+### Docker Build
 ```
 docker build -t suds_image . 
 ```
