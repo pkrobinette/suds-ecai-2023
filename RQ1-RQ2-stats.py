@@ -313,7 +313,7 @@ def generate_table(args):
     #
     # Load data
     #
-    get_name = lambda a : "results/noise_comparison/"+ str(a) + "_im_stats.csv"
+    get_name = lambda a : f"results/{args.savedir}/"+ str(a) + "_im_stats.csv"
     df1 = pd.read_csv(get_name("suds"))
     df2 = pd.read_csv(get_name("gauss"))
 
