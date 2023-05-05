@@ -45,10 +45,12 @@ def pretty_picture(input_path, save_name, noise="suds", imsize=64, dataset="mnis
     # Set the number of images per row and column in the final image
     images_per_row = 6
     images_per_column = 6
+    padding = 20  # Set the padding value as needed
     
     # Create a blank image with the combined dimensions
     imtype = "L" if dataset == "mnist" else "RGB"
-    combined_image = Image.new(imtype, (width * images_per_row, height * images_per_column))
+    color = 255 if dataset == "mnist" else (255, 255, 255)
+    combined_image = Image.new(imtype, (width * images_per_row, height * images_per_column + padding*(images_per_column//3)), color)
 
     if dataset == "cifar":
         noise = "cifar"
@@ -76,7 +78,15 @@ def pretty_picture(input_path, save_name, noise="suds", imsize=64, dataset="mnis
         
                 # Calculate the position of the current image
                 x = col * width
-                y = ((i*2)+j) * height
+                # y = ((i*2)+j) * height
+                
+                if (i*2)+j >= 2 and (i*2)+j < 4:
+                    y = ((i*2)+j) * height + padding
+                elif (i*2)+j >= 4:
+                    y = ((i*2)+j) * height + 2 * padding
+                else:
+                    y = ((i*2)+j) * height
+
         
                 # Paste the current image into the combined image
                 combined_image.paste(image, (x, y))
