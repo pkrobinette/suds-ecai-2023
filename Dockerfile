@@ -12,7 +12,7 @@ RUN apt-get update -y \
     && apt-get install -y python3-pip
 
 # Set container's working directory
-WORKDIR /ecai-2023
+WORKDIR /suds-ecai-2023
 
 # Copy files and directory structure to working directory
 COPY . .
