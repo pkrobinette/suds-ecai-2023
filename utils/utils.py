@@ -157,8 +157,9 @@ def load_ddh_mnist(config="gray_ddh"):
     RnetD.load_state_dict(R_state_diff)
     
     # print("Re SAVE: ")
-    # torch.save(HnetD.state_dict(), 'HnetD_checkpoint.tar')
-    # torch.save(RnetD.state_dict(), 'RnetD_checkpoint.tar')
+    # n = "ddh_mnist" if "gray" in config else "ddh_cifar"
+    # torch.save(HnetD.state_dict(), f'models/steg/{n}/HnetD_checkpoint.tar')
+    # torch.save(RnetD.state_dict(), f'models/steg/{n}/RnetD_checkpoint.tar')
     
     
     print(f"Finished loading MNIST DDH Models...")
@@ -223,8 +224,9 @@ def load_udh_mnist(config="gray_udh"):
     Rnet.load_state_dict(R_state)
     
     # print("re SAVE: ")
-    # torch.save(Hnet.state_dict(), 'Hnet_checkpoint.tar')
-    # torch.save(Rnet.state_dict(), 'Rnet_checkpoint.tar')
+    # n = "udh_mnist" if "gray" in config else "udh_cifar"
+    # torch.save(Hnet.state_dict(), f'models/steg/{n}/Hnet_checkpoint.tar')
+    # torch.save(Rnet.state_dict(), f'models/steg/{n}/Rnet_checkpoint.tar')
     
     Hnet.eval()
     Rnet.eval()
