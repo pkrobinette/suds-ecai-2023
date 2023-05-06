@@ -7,10 +7,10 @@ import glob
 import time
 import argparse
 from PIL import Image
+# from rawkit import raw
 import torchvision
 import torch
 import torch.nn as nn
-import torch.nn.init as init
 from torchvision import transforms, datasets
 from torch.utils.data import DataLoader
 import yaml
@@ -20,9 +20,17 @@ from .RevealNet import RevealNet
 from .StegoPy import encode_msg, decode_msg, encode_img, decode_img
 from .vae import CNN_VAE
 from .classifier import Classifier
-# from dhide_main import weights_init
+import torch.nn.init as init
 import itertools
 from tqdm import tqdm
+from torch.nn.functional import normalize
+from skimage.util import random_noise
+import numpy as np
+import random
+
+
+np.random.seed(4)
+random.seed(4)
 
 TRANSFORMS_GRAY = transforms.Compose([ 
                 transforms.Grayscale(num_output_channels=1),
@@ -37,13 +45,19 @@ TRANSFORMS_RGB = transforms.Compose([
 
 SUDS_CONFIG_PATH = "configs/" # CHANGE IF DIFFERENT
 
+
+# Custom weights initialization called on netG and netD
 def weights_init(m):
+    """
+    Init weights.
+    """
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
         init.kaiming_normal_(m.weight.data, a=0, mode='fan_out')
     elif classname.find('BatchNorm') != -1:
         m.weight.data.fill_(1.0) 
         m.bias.data.fill_(0)
+
 
 def load_data(dataset, batch_size=128):
     """
@@ -127,7 +141,6 @@ def load_ddh_mnist(config="gray_ddh"):
         H_state_diff = torch.load(data["test_diff"] + "/HnetD_checkpoint.tar")
         R_state_diff = torch.load(data["test_diff"] + "/RnetD_checkpoint.tar")
     except:
-        print("OLD")
         checkpoint_diff = data["test_diff"] + "/checkPoints/" + "checkpoint.pth.tar"
         checkpoint_diff = torch.load(checkpoint_diff, map_location=torch.device('cpu'))
         H_state_diff = {}
@@ -220,7 +233,7 @@ def load_udh_mnist(config="gray_udh"):
     
     return Hnet, Rnet
 
-def load_vae_suds(channels=1, k_num=128, z_size=128, im_size=32):
+def load_vae_suds(channels=1, k_num=128, z_size=128, im_size=32, dataset="mnist"):
     """ 
     Load vae sanitization model, SUDS
     
@@ -245,7 +258,7 @@ def load_vae_suds(channels=1, k_num=128, z_size=128, im_size=32):
     name = "_"+str(z_size)+"/"
     # if z_size == 128:
     #     name = "/"
-    path = "models/sanitization/suds_mnist"+name+"model.pth"
+    path = "models/sanitization/suds_"+dataset+name+"model.pth"
     print(f"VAE load using --> {path}")
     assert (os.path.exists(path)), "Model does not exist. Try again."
     #
@@ -321,6 +334,10 @@ def use_lsb(covers, secrets, sani_model=None):
     if covers.max() <= 1:
         covers = covers.clone().detach()*255
         secrets = secrets.clone().detach()*255
+    try:
+        _, c, h, w = covers.shape
+    except:
+        c, h, w = covers.shape
     #
     # Steg hide
     #
@@ -333,7 +350,10 @@ def use_lsb(covers, secrets, sani_model=None):
     #
     if sani_model != None:
         with torch.no_grad():
-            chat, _, _ = sani_model.forward_train(containers/255) # sani model is on pixels [0, 1]
+            if c == 3:
+                chat, _, _ = sani_model.forward_train(containers) # cifar vae model trained on [0, 1]
+            else:
+                chat, _, _ = sani_model.forward_train(containers/255) # sani model is on pixels [0, 1]
         reveal_sani_secret = decode_img(chat*255, train_mode=True)
         return containers/255, chat, C_res/255, reveal_secret/255, reveal_sani_secret/255, S_res/255
     
@@ -378,6 +398,10 @@ def use_ddh(covers, secrets, HnetD, RnetD, sani_model=None):
         covers = covers.clone().detach()/255
     if secrets.max() > 1:
         secrets = secrets.clone().detach()/255
+    try:
+        _, c, h, w = covers.shape
+    except:
+        c, h, w = covers.shape
     #
     # Steg Hide
     #
@@ -394,7 +418,10 @@ def use_ddh(covers, secrets, HnetD, RnetD, sani_model=None):
     #
     if sani_model != None:
         with torch.no_grad():
-            chat, _, _ = sani_model.forward_train(containers) # sani model is on pixels [0, 1]
+            if c == 3:
+                chat, _, _ = sani_model.forward_train(containers*255) # cifar suds trained on [0, 255]
+            else:
+                chat, _, _ = sani_model.forward_train(containers) # sani model is on pixels [0, 1]
             reveal_sani_secret = RnetD(chat)
         return containers, chat, C_res, reveal_secret, reveal_sani_secret, S_res
     
@@ -439,6 +466,10 @@ def use_udh(covers, secrets, Hnet, Rnet, sani_model=None):
         covers = covers.clone().detach()/255
     if secrets.max() > 1:
         secrets = secrets.clone().detach()/255
+    try:
+        _, c, h, w = covers.shape
+    except:
+        c, h, w = covers.shape
     #
     # Steg Hide
     #
@@ -453,7 +484,10 @@ def use_udh(covers, secrets, Hnet, Rnet, sani_model=None):
     #
     if sani_model != None:
         with torch.no_grad():
-            chat, _, _ = sani_model.forward_train(containers) # sani model is on pixels [0, 1]
+            if c == 3:
+                chat, _, _ = sani_model.forward_train(containers*255) # cifar suds trained on [0, 255]
+            else:
+                chat, _, _ = sani_model.forward_train(containers) # sani model is on pixels [0, 1]
             reveal_sani_secret = Rnet(chat)
         return containers, chat, C_res, reveal_secret, reveal_sani_secret, S_res
     
@@ -613,3 +647,62 @@ def udh_eval_latent_all(test_loader, master_idx, Hnet, vae_model):
     z_cover_all = torch.cat(z_cover_all, dim=0)
     
     return z_cover_all, z_cont_all, master_l
+
+
+def add_gauss(imgs, mu=0, sigma=0.02):
+    """
+    Add gaussian noise to images.
+    
+    Parameters
+    ----------
+    imgs : tensor
+        tensor of images
+    mu : float
+        mean
+    sigma : float
+        std
+    """
+    # creat a mask for the noise
+    rnd_tnsor = torch.rand(imgs.shape)
+    mask = (rnd_tnsor > 0.5).float()
+    
+    dim = list(imgs.shape)
+    n = torch.normal(mu, sigma, dim)
+    n = mask*n
+    
+    return torch.clip(imgs + n, 0, 1)
+
+def add_saltnpep(imgs, pep=0.2):
+    """
+    Add saltnpepper noise to images.
+    
+    Parameters
+    ----------
+    imgs : tensor
+        tensor of images
+    pep : float
+        salt to pepper ratio.
+    """
+    return torch.tensor(random_noise(imgs, 
+                              mode='s&p', 
+                              salt_vs_pepper=pep).astype(np.float32))
+
+def add_speckle(imgs, mu=0, var=0.01):
+    """
+    Add speckle noise to images.
+    
+    Parameters
+    ----------
+    imgs : tensor
+        tensor of images
+    mu : float
+        mean
+    var : float
+        variance
+    """
+    return torch.tensor(random_noise(imgs, 
+                              mode='speckle', 
+                              mean=mu, 
+                              var=var, 
+                              clip=True).astype(np.float32))
+
