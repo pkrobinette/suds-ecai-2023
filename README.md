@@ -11,7 +11,7 @@ conda create -y -n SUDS pip python=3.8 && conda activate SUDS && pip install -r 
 
 ### Docker Build
 ```
-docker build -t suds_image . 
+docker build --build-arg WORKDIR_PATH=$(pwd) -t suds_image . 
 ```
 
 ```
