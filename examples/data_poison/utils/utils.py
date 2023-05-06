@@ -122,20 +122,31 @@ def load_ddh_mnist(config="gray_ddh"):
     #
     # Apply DDH saved info
     #
-    checkpoint_diff = data["test_diff"] + "/checkPoints/" + "checkpoint.pth.tar"
-    checkpoint_diff = torch.load(checkpoint_diff, map_location=torch.device('cpu'))
-    H_state_diff = {}
-    R_state_diff = {}
-    for k in checkpoint_diff["H_state_dict"].keys():
-        name = k.replace("module.", "")
-        H_state_diff[name] = checkpoint_diff["H_state_dict"][k]
-    
-    for l in checkpoint_diff["R_state_dict"].keys():
-        name = l.replace("module.", "")
-        R_state_diff[name] = checkpoint_diff["R_state_dict"][l]
+    ## WITH RESAVE
+    try:
+        H_state_diff = torch.load(data["test_diff"] + "/HnetD_checkpoint.tar")
+        R_state_diff = torch.load(data["test_diff"] + "/RnetD_checkpoint.tar")
+    except:
+        print("OLD")
+        checkpoint_diff = data["test_diff"] + "/checkPoints/" + "checkpoint.pth.tar"
+        checkpoint_diff = torch.load(checkpoint_diff, map_location=torch.device('cpu'))
+        H_state_diff = {}
+        R_state_diff = {}
+        for k in checkpoint_diff["H_state_dict"].keys():
+            name = k.replace("module.", "")
+            H_state_diff[name] = checkpoint_diff["H_state_dict"][k]
+        
+        for l in checkpoint_diff["R_state_dict"].keys():
+            name = l.replace("module.", "")
+            R_state_diff[name] = checkpoint_diff["R_state_dict"][l]
         
     HnetD.load_state_dict(H_state_diff)
     RnetD.load_state_dict(R_state_diff)
+    
+    # print("Re SAVE: ")
+    # torch.save(HnetD.state_dict(), 'HnetD_checkpoint.tar')
+    # torch.save(RnetD.state_dict(), 'RnetD_checkpoint.tar')
+    
     
     print(f"Finished loading MNIST DDH Models...")
     
@@ -178,20 +189,29 @@ def load_udh_mnist(config="gray_udh"):
     #
     # Apply saved checkpoint and weights
     #
-    checkpoint = data["test"] + "/checkPoints/" + "checkpoint.pth.tar"
-    checkpoint = torch.load(checkpoint, map_location=torch.device('cpu'))
-    H_state = {}
-    R_state = {}
-    for k in checkpoint["H_state_dict"].keys():
-        name = k.replace("module.", "")
-        H_state[name] = checkpoint["H_state_dict"][k]
-    
-    for l in checkpoint["R_state_dict"].keys():
-        name = l.replace("module.", "")
-        R_state[name] = checkpoint["R_state_dict"][l]
+    ## WITH RESAVE
+    try:
+        H_state = torch.load(data["test"] + "/Hnet_checkpoint.tar")
+        R_state = torch.load(data["test"] + "/Rnet_checkpoint.tar")
+    except:
+        checkpoint = data["test"] + "/checkPoints/" + "checkpoint.pth.tar"
+        checkpoint = torch.load(checkpoint, map_location=torch.device('cpu'))
+        H_state = {}
+        R_state = {}
+        for k in checkpoint["H_state_dict"].keys():
+            name = k.replace("module.", "")
+            H_state[name] = checkpoint["H_state_dict"][k]
+        
+        for l in checkpoint["R_state_dict"].keys():
+            name = l.replace("module.", "")
+            R_state[name] = checkpoint["R_state_dict"][l]
     
     Hnet.load_state_dict(H_state)
     Rnet.load_state_dict(R_state)
+    
+    # print("re SAVE: ")
+    # torch.save(Hnet.state_dict(), 'Hnet_checkpoint.tar')
+    # torch.save(Rnet.state_dict(), 'Rnet_checkpoint.tar')
     
     Hnet.eval()
     Rnet.eval()

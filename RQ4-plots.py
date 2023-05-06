@@ -120,7 +120,7 @@ def main(args):
     if os.path.exists(args.savedir) == 0:
         os.mkdir(args.savedir)
     plt.savefig(f"{args.savedir}/latent_mappings_plot_compact.pdf")
-    plt.show()
+    # plt.show()
     #
     # Generate Complete Entire Image
     #
@@ -180,7 +180,7 @@ def main(args):
         os.mkdir(args.savedir)
     plt.tight_layout()
     plt.savefig(f'{args.savedir}/latent_mappings_plot.pdf', bbox_inches='tight')
-    plt.show()
+    # plt.show()
     
 if __name__ == "__main__":
     args = get_args()
