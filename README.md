@@ -1,4 +1,5 @@
 # SUDS: Sanitizing Universal and Dependent Steganography
+These experiments were conducted on a macOS Monterey 12.5.1 with a 2.3 GHz 8-Core Intel Core i9 processor with 16 GB 2667 MHz DDR4 of memory.
 
 ## Installation
 ### Conda Environment (Recommended)
