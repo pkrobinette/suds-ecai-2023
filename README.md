@@ -2,15 +2,27 @@
 These experiments were conducted on a macOS Monterey 12.5.1 with a 2.3 GHz 8-Core Intel Core i9 processor with 16 GB 2667 MHz DDR4 of memory.
 
 ## Installation
-
+1. Download this repository (zip or clone)
+2. Change to this working directory
+* If zip:*
+```
+cd suds-ecai-2023-master
+```
+* If clone:*
+```
+cd suds-ecai-2023
+```
+3. Install necessary dependencies with one of the options below (Conda Environment, Docker Build).
+---
 ### Conda Environment (Recommended)
 This creates, activates, and installs all necessary dependencies.
 ```
 conda create -y -n SUDS pip python=3.8 && conda activate SUDS && pip install -r requirements.txt
 ```
-
+**OR**
 
 ### Docker Build
+Creates a docker container.
 ```
 docker build --build-arg WORKDIR_PATH=$(pwd) -t suds_image . 
 ```
