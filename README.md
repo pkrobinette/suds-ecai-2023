@@ -22,12 +22,17 @@ sudo docker run --name suds --rm -it suds_image bash
 
 ## Artifact Instructions (~1.5 hrs to run)
 All models are pre-trained. Reproduce results by:
-
+1. Extract pre-trained models:
+```
+find models/ -name "*.tar.gz" -exec gunzip -f {} \;
+```
+2. Reproduce all Figures:
 ```
 chmod +x scripts/*
 ./scripts/test_all.sh
 ```
-2. If you would like to reproduce a specific figure, see the index below and run:
+
+3. If you would like to reproduce a specific figure instead of running all tests, see the index below and run:
 ```
 python *.py
 ```
