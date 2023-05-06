@@ -21,7 +21,7 @@ sudo docker run --name suds --rm -it suds_image bash
 ```
 
 
-## Artifact Instructions
+## Artifact Instructions (~1.5 hrs to run)
 All models are pre-trained. Reproduce results by:
 
 ```
