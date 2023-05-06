@@ -3,15 +3,11 @@ These experiments were conducted on a macOS Monterey 12.5.1 with a 2.3 GHz 8-Cor
 
 ## Installation
 1. Download this repository (zip or clone)
-2. Change to this working directory
-* If zip:*
-```
-cd suds-ecai-2023-master
-```
-* If clone:*
-```
-cd suds-ecai-2023
-```
+2. Open a terminal and change to this working directory
+> if zip: `suds-ecai-2023-master`
+> 
+> if clone: `suds-ecai-2023`
+
 3. Install necessary dependencies with one of the options below (Conda Environment, Docker Build).
 ---
 ### Conda Environment (Recommended)
